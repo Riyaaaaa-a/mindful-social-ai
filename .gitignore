@@ -1,0 +1,62 @@
+# Mindful Social Chrome Extension - .gitignore
+
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Editor directories and files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Test files
+test/
+tests/
+*.test.js
+*.spec.js
+
+# Build artifacts
+dist/
+build/
+*.zip
+*.crx
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Environment files (if any added later)
+.env
+.env.local
+.env.*.local
+
+# Icons (already generated, don't re-commit)
+# Uncomment if you want to track icon generation
+# icons/icon*.png
+
+
+
+
+
+
+
+
+

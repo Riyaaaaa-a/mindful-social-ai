@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mindful Break - Mindful Social</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        .container {
+            text-align: center;
+            max-width: 600px;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+        h1 {
+            font-size: 3rem;
+            margin: 0;
+            margin-bottom: 20px;
+        }
+        p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        .timer {
+            font-size: 4rem;
+            font-weight: bold;
+            margin: 30px 0;
+        }
+        button {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin: 10px;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        .tips {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 30px;
+            text-align: left;
+        }
+        .tip {
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .mood-btn {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin: 5px;
+            font-weight: 600;
+            font-size: 1rem;
+            border: 2px solid transparent;
+        }
+        .mood-btn:hover {
+            transform: translateY(-2px);
+            border-color: #4CAF50;
+        }
+        .mood-btn.selected {
+            background: #4CAF50;
+            color: white;
+            border-color: #4CAF50;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌸 Mindful Break 🌸</h1>
+        <p>Take a moment to breathe and check in with yourself</p>
+        
+        <div id="countdown" class="timer">
+            <div>Take a deep breath...</div>
+            <div style="font-size: 2rem; margin-top: 20px; opacity: 0.8;">Close this tab when you're ready to return</div>
+        </div>
+
+        <button onclick="window.close()">✓ I'm Ready to Return</button>
+        <button onclick="location.reload()">⟳ Take Another Break</button>
+
+        <div class="tips">
+            <h3 style="text-align: center; margin-top: 0;">🧘 Mindful Tips:</h3>
+            <div class="tip">
+                <span>💭</span> <span>Take 3 deep breaths - inhale for 4 counts, hold for 4, exhale for 4</span>
+            </div>
+            <div class="tip">
+                <span>💧</span> <span>Drink a glass of water to rehydrate</span>
+            </div>
+            <div class="tip">
+                <span>🌿</span> <span>Look away from your screen and focus on something 20 feet away for 20 seconds</span>
+            </div>
+            <div class="tip">
+                <span>💚</span> <span>Reflect: How are you feeling right now? What do you need?</span>
+            </div>
+            <div class="tip">
+                <span>🚶</span> <span>Take a short walk or stretch your body</span>
+            </div>
+        </div>
+
+        <!-- Mood Check-in Section -->
+        <div id="moodSection" class="tips" style="display: none;">
+            <h3 style="text-align: center; margin-top: 0;">How are you feeling?</h3>
+            <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+                <button class="mood-btn" data-mood="inspired">😊 Good</button>
+                <button class="mood-btn" data-mood="okay">😐 Okay</button>
+                <button class="mood-btn" data-mood="drained">😩 Drained</button>
+            </div>
+        </div>
+
+        <p style="margin-top: 30px; font-size: 1rem; opacity: 0.8;">
+            Remember: Mindful social media use helps you stay in control. Listen to your body and mind.
+        </p>
+    </div>
+
+    <script>
+        // Simple breathing exercise animation
+        let breathCount = 0;
+        const breathInterval = setInterval(() => {
+            breathCount++;
+            const countdown = document.getElementById('countdown');
+            if (breathCount <= 3) {
+                countdown.innerHTML = `
+                    <div style="font-size: 3rem; margin-bottom: 10px;">💨</div>
+                    <div>Breath ${breathCount} of 3</div>
+                    <div style="font-size: 1.5rem; margin-top: 20px; opacity: 0.8;">
+                        ${breathCount === 1 ? 'Inhale slowly...' : breathCount === 2 ? 'Hold your breath...' : 'Exhale slowly...'}
+                    </div>
+                `;
+            } else {
+                clearInterval(breathInterval);
+                countdown.innerHTML = `
+                    <div style="font-size: 2rem;">✨ You've completed your breathing exercise ✨</div>
+                    <div style="font-size: 1.5rem; margin-top: 20px; opacity: 0.8;">Take your time, you're ready when you are</div>
+                `;
+            }
+        }, 4000);
+
+        // Add page visibility handler
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                // Page is visible again
+                document.getElementById('countdown').innerHTML = `
+                    <div style="font-size: 1.5rem;">Welcome back! How are you feeling?</div>
+                `;
+                // Show mood check-in
+                document.getElementById('moodSection').style.display = 'block';
+            }
+        });
+
+        // Handle mood button clicks
+        document.querySelectorAll('.mood-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const mood = e.target.dataset.mood;
+                // Save mood to storage (similar to popup.js)
+                const today = new Date().toISOString().split('T')[0];
+                const result = await chrome.storage.local.get(['trackingData']);
+                const trackingData = result.trackingData || [];
+
+                trackingData.push({
+                    date: today,
+                    domain: 'mindful-break',
+                    app_name: 'Mindful Break',
+                    duration_minutes: 0,
+                    scroll_rate: 0,
+                    checkins_triggered: 0,
+                    mood: mood
+                });
+
+                await chrome.storage.local.set({ trackingData });
+
+                // Visual feedback
+                e.target.classList.add('selected');
+
+                // Hide mood section after selection
+                setTimeout(() => {
+                    document.getElementById('moodSection').style.display = 'none';
+                }, 1000);
+            });
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+

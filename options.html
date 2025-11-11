@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mindful Social - Settings</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="max-w-2xl mx-auto p-6">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-blue-500 to-purple-500 text-white p-6 rounded-t-lg">
+            <h1 class="text-2xl font-bold mb-2">Settings</h1>
+            <p class="text-blue-100 text-sm">Manage your digital wellness preferences</p>
+        </div>
+
+        <!-- Consent Section -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-4">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4">Privacy & Tracking</h2>
+            
+            <div class="mb-4">
+                <label class="flex items-center cursor-pointer">
+                    <input type="checkbox" id="consentToggle" class="w-5 h-5 text-blue-500 rounded focus:ring-blue-400">
+                    <span class="ml-3 text-gray-700">Enable local tracking</span>
+                </label>
+                <p class="text-sm text-gray-500 mt-2 ml-8">
+                    All data is stored locally on your device. We never collect or transmit any personal information.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 gap-3 mt-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Check-in reminder interval (minutes)</label>
+                    <input type="number" id="checkinInterval" min="1" max="1440" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="e.g., 30">
+                </div>
+                <div>
+                    <button id="saveReminderBtn" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg transition">Save Reminder</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Goals Section -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-4">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4">My Goals</h2>
+            <div class="space-y-3" id="goalsList"></div>
+            <div class="mt-4 grid grid-cols-1 gap-3">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Goal label</label>
+                    <input id="goalLabel" type="text" placeholder="e.g., Limit social media to 60 min/day" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+                </div>
+                <div class="flex gap-2">
+                    <button id="addGoalBtn" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg transition">Add Goal</button>
+                    <button id="saveGoalEditBtn" class="hidden flex-1 bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg transition">Save Changes</button>
+                    <button id="cancelGoalEditBtn" class="hidden flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2 px-4 rounded-lg transition">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions Section -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-4">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4">My Actions</h2>
+            <div class="space-y-3" id="actionsList"></div>
+            <div class="mt-4 grid grid-cols-1 gap-3">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Action label</label>
+                    <input id="actionLabel" type="text" placeholder="e.g., Open Calm breathing exercise" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Type</label>
+                        <select id="actionType" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="link">Link</option>
+                            <option value="internal">Internal</option>
+                            <option value="dismiss">Dismiss</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">URL (optional)</label>
+                        <input id="actionUrl" type="url" placeholder="https://example.com" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <button id="addActionBtn" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg transition">Add Action</button>
+                    <button id="saveActionEditBtn" class="hidden flex-1 bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg transition">Save Changes</button>
+                    <button id="cancelActionEditBtn" class="hidden flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2 px-4 rounded-lg transition">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Management Section -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-4">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4">Data Management</h2>
+            
+            <div class="space-y-3">
+                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                    <div>
+                        <div class="font-medium text-gray-800">Export Data</div>
+                        <div class="text-sm text-gray-500">Download your tracking data as JSON</div>
+                    </div>
+                    <button id="exportDataBtn" class="bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded-lg transition">
+                        Export
+                    </button>
+                </div>
+                
+                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                    <div>
+                        <div class="font-medium text-gray-800">Delete All Data</div>
+                        <div class="text-sm text-gray-500">Permanently delete all stored data</div>
+                    </div>
+                    <button id="deleteAllDataBtn" class="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-lg transition">
+                        Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Settings removed: token embedded via config.js per requirements -->
+
+        <!-- Statistics Section -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-4">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4">Your Statistics</h2>
+            
+            <div id="statsDisplay" class="space-y-3">
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-blue-50 p-4 rounded-lg">
+                        <div class="text-2xl font-bold text-blue-600" id="totalDays">0</div>
+                        <div class="text-sm text-gray-600">Days tracked</div>
+                    </div>
+                    <div class="bg-purple-50 p-4 rounded-lg">
+                        <div class="text-2xl font-bold text-purple-600" id="totalTime">0h</div>
+                        <div class="text-sm text-gray-600">Total time</div>
+                    </div>
+                    <div class="bg-green-50 p-4 rounded-lg">
+                        <div class="text-2xl font-bold text-green-600" id="totalCheckins">0</div>
+                        <div class="text-sm text-gray-600">Check-ins</div>
+                    </div>
+                    <div class="bg-orange-50 p-4 rounded-lg">
+                        <div class="text-2xl font-bold text-orange-600" id="avgTime">0h</div>
+                        <div class="text-sm text-gray-600">Avg per day</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- About Section -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4">About</h2>
+            <p class="text-gray-600 text-sm mb-3">
+                <strong>Mindful Social v1.0.0</strong> — Your digital wellness companion.
+            </p>
+            <p class="text-gray-600 text-sm mb-3">
+                Track your social media habits and practice mindful digital engagement.
+            </p>
+            <p class="text-gray-600 text-sm">
+                All data is stored locally on your device. Nothing is transmitted externally.
+            </p>
+        </div>
+
+        <!-- Toast notification -->
+        <div id="toast" class="hidden fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50">
+            <div class="flex items-center gap-2">
+                <span id="toastMessage"></span>
+            </div>
+        </div>
+    </div>
+
+    <script src="options.js"></script>
+</body>
+</html>
