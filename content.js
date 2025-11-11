@@ -26,42 +26,6 @@ const CONTINUOUS_SCROLL_THRESHOLD = 10 * 60 * 1000; // 10 minutes in millisecond
  * Listen for messages from background script
  * Set up immediately so it's ready for check-in messages
  */
-/*chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  console.log('Content script received message:', request.type);
-  
-  if (request.type === 'SHOW_AI_CHECKIN') {
-    console.log('Showing AI check-in popup...');
-    try {
-      showAICheckInPopup(request.coaching, request.alternatives || []);
-      console.log('AI check-in popup shown successfully');
-      sendResponse({ success: true });
-    } catch (error) {
-      console.error('Error showing AI popup:', error);
-      sendResponse({ success: false, error: error.message });
-    }
-    return true;
-  }
-  
-  if (request.type === 'SHOW_CHECKIN_OVERLAY') {
-    console.log('Showing check-in overlay...');
-    try {
-      showCheckInIndicator();
-      console.log('Check-in overlay shown successfully');
-      sendResponse({ success: true });
-    } catch (error) {
-      console.error('Error showing check-in overlay:', error);
-      sendResponse({ success: false, error: error.message });
-    }
-    return true;
-  }
-  
-  return true; // Keep channel open for async response
-});*/
-
-/**
- * Listen for messages from background script
- * Set up immediately so it's ready for check-in messages
- */
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   console.log('📨 Content script received message:', request.type);
   
@@ -73,6 +37,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   
   if (request.type === 'SHOW_AI_CHECKIN') {
     console.log('✅ SHOW_AI_CHECKIN received');
+    console.log('Request:', request);
     console.log('Coaching:', request.coaching);
     console.log('Alternatives:', request.alternatives);
     

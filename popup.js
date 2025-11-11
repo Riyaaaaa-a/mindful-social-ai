@@ -353,8 +353,10 @@ async function renderAIContent() {
         if (t === 'link' && a.url) {
           chrome.tabs.create({ url: a.url });
         } else if (t === 'internal') {
-          if ((a.action || '') === 'dismiss') window.close();
-          else showToast('Action performed');
+          if ((a.action || '') === 'dismiss') {
+            // Only close the popup, do not reload the tab
+            window.close();
+          } else showToast('Action performed');
         }
       });
       suggestionsContainer.appendChild(btn);
