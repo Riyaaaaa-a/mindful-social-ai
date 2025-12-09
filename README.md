@@ -1,3 +1,4 @@
+The extension is created completely from scratch, there is no initial source code used from anywhere. 
 # Mindful Social - Chrome Extension
 
 A Chrome Extension (Manifest v3) that helps you monitor your social media habits and practice digital mindfulness with gentle check-ins.
