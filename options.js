@@ -34,6 +34,11 @@ const totalTime = document.getElementById('totalTime');
 const totalCheckins = document.getElementById('totalCheckins');
 const avgTime = document.getElementById('avgTime');
 
+// Mood Insights elements (may be null if section doesn't exist)
+let moodChartContainer = null;
+let moodStats = null;
+let moodChart = null;
+
 // Toast element
 const toast = document.getElementById('toast');
 const toastMessage = document.getElementById('toastMessage');
@@ -115,8 +120,6 @@ async function loadSettings() {
     // Load check-in reminder
     const intervalData = await chrome.storage.local.get(['checkinInterval']);
     checkinIntervalInput.value = intervalData.checkinInterval || '30';
-
-    // No AI settings to load; token is embedded via config.js
   } catch (error) {
     console.error('Error loading settings:', error);
   }
@@ -154,8 +157,6 @@ async function saveSettings() {
     showToast('Error saving settings ✗');
   }
 }
-
-// No AI settings save; token embedded via config.js
 
 // -------- Goals CRUD --------
 
@@ -366,9 +367,10 @@ function cancelActionEdit() {
  */
 async function exportData() {
   try {
-    const result = await chrome.storage.local.get(['trackingData']);
+    const result = await chrome.storage.local.get(['trackingData', 'moodLogs']);
     const data = {
       trackingData: result.trackingData || [],
+      moodLogs: result.moodLogs || [],
       exportedAt: new Date().toISOString(),
       version: '1.0.0'
     };
@@ -411,6 +413,11 @@ async function deleteAllData() {
     
     showToast('All data deleted! 🗑️');
     loadStatistics();
+    loadGoals();
+    loadActions();
+    if (moodChartContainer) {
+      loadMoodInsights().catch(() => {});
+    }
   } catch (error) {
     console.error('Error deleting data:', error);
     showToast('Error deleting data ✗');
@@ -418,9 +425,171 @@ async function deleteAllData() {
 }
 
 /**
+ * Load and render mood insights chart
+ */
+async function loadMoodInsights() {
+  try {
+    // Get elements if not already cached (in case DOM changes)
+    if (!moodChartContainer) {
+      moodChartContainer = document.getElementById('moodChartContainer');
+    }
+    if (!moodStats) {
+      moodStats = document.getElementById('moodStats');
+    }
+    
+    // If mood insights section doesn't exist, just return
+    if (!moodChartContainer || !moodStats) {
+      return;
+    }
+    
+    // Check if Chart.js is loaded (check both global and window scope)
+    const ChartLib = typeof Chart !== 'undefined' ? Chart : (typeof window !== 'undefined' && window.Chart ? window.Chart : null);
+    if (!ChartLib) {
+      console.warn('Chart.js not loaded yet, waiting...');
+      setTimeout(loadMoodInsights, 500);
+      return;
+    }
+    
+    const aggregatedData = await aggregateMoodDataByDay();
+    
+    if (aggregatedData.length === 0) {
+      if (moodChartContainer) {
+        moodChartContainer.innerHTML = '<p class="text-center text-gray-500 py-8">No mood data yet. Start logging your moods to see insights!</p>';
+      }
+      if (moodStats) {
+        moodStats.innerHTML = '';
+      }
+      return;
+    }
+    
+    // Limit to last 14 days for better readability
+    const recentData = aggregatedData.slice(0, 14).reverse();
+    
+    // Prepare chart data
+    const labels = recentData.map(d => formatDateForDisplay(d.date));
+    const inspiredData = recentData.map(d => d.inspiredCount);
+    const okayData = recentData.map(d => d.okayCount);
+    const drainedData = recentData.map(d => d.drainedCount);
+    
+    // Destroy existing chart if it exists
+    if (moodChart) {
+      moodChart.destroy();
+      moodChart = null;
+    }
+    
+    // Get canvas element
+    const canvas = document.getElementById('moodChart');
+    if (!canvas) {
+      console.error('Mood chart canvas not found');
+      return;
+    }
+    
+    // Create new chart
+    const ctx = canvas.getContext('2d');
+    const ChartLib2 = typeof Chart !== 'undefined' ? Chart : (typeof window !== 'undefined' && window.Chart ? window.Chart : null);
+    if (!ChartLib2) {
+      console.error('Chart.js library not available');
+      return;
+    }
+    moodChart = new ChartLib2(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: 'Inspired',
+            data: inspiredData,
+            backgroundColor: 'rgba(34, 197, 94, 0.7)',
+            borderColor: 'rgba(34, 197, 94, 1)',
+            borderWidth: 1
+          },
+          {
+            label: 'Okay',
+            data: okayData,
+            backgroundColor: 'rgba(59, 130, 246, 0.7)',
+            borderColor: 'rgba(59, 130, 246, 1)',
+            borderWidth: 1
+          },
+          {
+            label: 'Drained',
+            data: drainedData,
+            backgroundColor: 'rgba(239, 68, 68, 0.7)',
+            borderColor: 'rgba(239, 68, 68, 1)',
+            borderWidth: 1
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false // We have custom legend in HTML
+          },
+          tooltip: {
+            mode: 'index',
+            intersect: false
+          }
+        },
+        scales: {
+          x: {
+            stacked: false,
+            grid: {
+              display: false
+            }
+          },
+          y: {
+            beginAtZero: true,
+            ticks: {
+              stepSize: 1
+            }
+          }
+        }
+      }
+    });
+    
+    // Calculate and display mood statistics
+    const totalInspired = aggregatedData.reduce((sum, d) => sum + d.inspiredCount, 0);
+    const totalOkay = aggregatedData.reduce((sum, d) => sum + d.okayCount, 0);
+    const totalDrained = aggregatedData.reduce((sum, d) => sum + d.drainedCount, 0);
+    const avgMinutes = aggregatedData.length > 0
+      ? Math.round(aggregatedData.reduce((sum, d) => sum + d.minutesActive, 0) / aggregatedData.length)
+      : 0;
+    
+    moodStats.innerHTML = `
+      <div class="bg-green-50 p-4 rounded-lg">
+        <div class="text-xl font-bold text-green-600">${totalInspired}</div>
+        <div class="text-sm text-gray-600">Inspired logs</div>
+      </div>
+      <div class="bg-blue-50 p-4 rounded-lg">
+        <div class="text-xl font-bold text-blue-600">${totalOkay}</div>
+        <div class="text-sm text-gray-600">Okay logs</div>
+      </div>
+      <div class="bg-red-50 p-4 rounded-lg">
+        <div class="text-xl font-bold text-red-600">${totalDrained}</div>
+        <div class="text-sm text-gray-600">Drained logs</div>
+      </div>
+      <div class="bg-purple-50 p-4 rounded-lg">
+        <div class="text-xl font-bold text-purple-600">${formatTime(avgMinutes)}</div>
+        <div class="text-sm text-gray-600">Avg minutes/day</div>
+      </div>
+    `;
+  } catch (error) {
+    console.error('Error loading mood insights:', error);
+    if (moodChartContainer) {
+      moodChartContainer.innerHTML = '<p class="text-center text-red-500 py-8">Error loading mood insights</p>';
+    }
+  }
+}
+
+/**
  * Initialize options page
  */
 async function init() {
+  // Initialize mood insights elements
+  moodChartContainer = document.getElementById('moodChartContainer');
+  moodStats = document.getElementById('moodStats');
+  
   // Ensure defaults exist (background also initializes, but double-safe)
   const { goals, actions } = await chrome.storage.local.get(['goals', 'actions']);
   if (!Array.isArray(goals) || goals.length === 0) {
@@ -439,27 +608,93 @@ async function init() {
   await loadGoals();
   await loadActions();
   
-  // Event listeners
-  consentToggle.addEventListener('change', saveSettings);
-  saveReminderBtn.addEventListener('click', saveSettings);
-  // No AI settings button
+  // Event listeners - MUST be attached regardless of Chart.js
+  if (consentToggle) {
+    consentToggle.addEventListener('change', saveSettings);
+  }
+  if (saveReminderBtn) {
+    saveReminderBtn.addEventListener('click', saveSettings);
+  }
 
   // Goals
-  addGoalBtn.addEventListener('click', addGoal);
-  saveGoalEditBtn.addEventListener('click', saveGoalEdit);
-  cancelGoalEditBtn.addEventListener('click', cancelGoalEdit);
+  if (addGoalBtn) {
+    addGoalBtn.addEventListener('click', addGoal);
+  }
+  if (saveGoalEditBtn) {
+    saveGoalEditBtn.addEventListener('click', saveGoalEdit);
+  }
+  if (cancelGoalEditBtn) {
+    cancelGoalEditBtn.addEventListener('click', cancelGoalEdit);
+  }
 
   // Actions
-  addActionBtn.addEventListener('click', addAction);
-  saveActionEditBtn.addEventListener('click', saveActionEdit);
-  cancelActionEditBtn.addEventListener('click', cancelActionEdit);
-  exportDataBtn.addEventListener('click', exportData);
-  deleteAllDataBtn.addEventListener('click', deleteAllData);
+  if (addActionBtn) {
+    addActionBtn.addEventListener('click', addAction);
+  }
+  if (saveActionEditBtn) {
+    saveActionEditBtn.addEventListener('click', saveActionEdit);
+  }
+  if (cancelActionEditBtn) {
+    cancelActionEditBtn.addEventListener('click', cancelActionEdit);
+  }
+  if (exportDataBtn) {
+    exportDataBtn.addEventListener('click', exportData);
+  }
+  if (deleteAllDataBtn) {
+    deleteAllDataBtn.addEventListener('click', deleteAllData);
+  }
   
   // No auto-save for goals/actions inputs; handled explicitly
   
   // Refresh statistics every 10 seconds
   setInterval(loadStatistics, 10000);
+  
+  // Load mood insights asynchronously (non-blocking)
+  // This won't prevent other functionality from working
+  setTimeout(() => {
+    try {
+      const checkChartLoaded = () => {
+        return typeof Chart !== 'undefined' || (typeof window !== 'undefined' && window.Chart);
+      };
+      
+      if (checkChartLoaded() && moodChartContainer) {
+        loadMoodInsights().catch(err => {
+          console.error('Error loading mood insights:', err);
+          if (moodChartContainer) {
+            moodChartContainer.innerHTML = '<p class="text-center text-gray-500 py-8">Mood insights unavailable</p>';
+          }
+        });
+      } else if (moodChartContainer) {
+        // Wait for Chart.js to load (non-blocking)
+        let attempts = 0;
+        const checkChart = setInterval(() => {
+          attempts++;
+          if (checkChartLoaded()) {
+            clearInterval(checkChart);
+            loadMoodInsights().catch(err => {
+              console.error('Error loading mood insights:', err);
+            });
+          } else if (attempts > 20) {
+            clearInterval(checkChart);
+            console.warn('Chart.js not available - mood insights disabled');
+            if (moodChartContainer) {
+              moodChartContainer.innerHTML = '<p class="text-center text-gray-500 py-8">Mood insights unavailable (Chart.js not loaded)</p>';
+            }
+          }
+        }, 500);
+      }
+    } catch (error) {
+      console.error('Error initializing mood insights:', error);
+      // Don't let this break the rest of the page
+    }
+  }, 100);
+  
+  // Refresh mood insights every 10 seconds (only if Chart.js is available)
+  setInterval(() => {
+    if (typeof Chart !== 'undefined' || (typeof window !== 'undefined' && window.Chart)) {
+      loadMoodInsights().catch(err => console.error('Error refreshing mood insights:', err));
+    }
+  }, 10000);
 }
 
 // Initialize when DOM is ready
@@ -468,5 +703,3 @@ if (document.readyState === 'loading') {
 } else {
   init();
 }
-
-

@@ -169,15 +169,15 @@ function showAICheckInPopup(coaching, alternatives) {
   // Create modal
   const modal = document.createElement('div');
   modal.style.cssText = `
-    background: white;
-    border-radius: 16px;
-    padding: 24px;
-    max-width: 500px;
-    width: 90%;
-    max-height: 80vh;
-    overflow-y: auto;
-    box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
-    animation: fadeInScale 0.3s ease-out;
+    background: white !important;
+    border-radius: 16px !important;
+    padding: 24px !important;
+    max-width: 500px !important;
+    width: 90% !important;
+    max-height: 80vh !important;
+    overflow-y: auto !important;
+    box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15) !important;
+    animation: fadeInScale 0.3s ease-out !important;
   `;
   
   // Coaching message
@@ -196,21 +196,21 @@ function showAICheckInPopup(coaching, alternatives) {
   
   // Actions container
   const actionsDiv = document.createElement('div');
-  actionsDiv.style.cssText = 'display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px;';
+  actionsDiv.style.cssText = 'display: flex !important; flex-direction: column !important; gap: 12px !important; margin-bottom: 16px !important;';
   
   // Create action buttons
   (alternatives || []).slice(0, 3).forEach(action => {
     const btn = document.createElement('button');
     btn.style.cssText = `
-      background: white;
-      border: 2px solid #e5e7eb;
-      border-radius: 8px;
-      padding: 12px 16px;
-      text-align: left;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-size: 14px;
-      color: #1f2937;
+      background: white !important;
+      border: 2px solid #e5e7eb !important;
+      border-radius: 8px !important;
+      
+      text-align: left !important;
+      cursor: pointer !important;
+      transition: all 0.2s !important;
+      font-size: 14px !important;
+      color: #1f2937 !important;
     `;
     btn.textContent = action.label || 'Take a break';
     btn.onmouseover = () => {

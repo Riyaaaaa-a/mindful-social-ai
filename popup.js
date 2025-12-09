@@ -364,17 +364,17 @@ async function renderAIContent() {
   }
 }
 
-document.getElementById("startFocus").addEventListener("click", async () => {
-  const duration = parseInt(document.getElementById("focusDuration").value);
-  const endTime = Date.now() + duration * 60 * 1000;
+// document.getElementById("startFocus").addEventListener("click", async () => {
+//   const duration = parseInt(document.getElementById("focusDuration").value);
+//   const endTime = Date.now() + duration * 60 * 1000;
 
-  await chrome.storage.local.set({
-    focusMode: { active: true, endTime }
-  });
+//   await chrome.storage.local.set({
+//     focusMode: { active: true, endTime }
+//   });
 
-  chrome.runtime.sendMessage({ type: "START_FOCUS_MODE" });
-  document.getElementById("focusStatus").innerText = `Focus Mode active for ${duration} mins 🚀`;
-});
+//   chrome.runtime.sendMessage({ type: "START_FOCUS_MODE" });
+//   document.getElementById("focusStatus").innerText = `Focus Mode active for ${duration} mins 🚀`;
+// });
 
 /**
  * Handle consent response
@@ -413,12 +413,23 @@ async function handleMoodClick(mood) {
   
   event.target.closest('.mood-btn').classList.add('border-blue-500', 'bg-blue-50');
   
-  // Store mood
-  const today = getTodayDate();
-  const result = await chrome.storage.local.get(['trackingData']);
-  const trackingData = result.trackingData || [];
+  // Store mood in moodLogs array
+  const result = await chrome.storage.local.get(['moodLogs']);
+  const moodLogs = result.moodLogs || [];
   
-  // Add mood entry
+  // Append new mood log with timestamp
+  moodLogs.push({
+    mood: mood,
+    timestamp: new Date().toISOString()
+  });
+  
+  await chrome.storage.local.set({ moodLogs });
+  
+  // Also store in trackingData for backward compatibility (existing logic)
+  const today = getTodayDate();
+  const trackingResult = await chrome.storage.local.get(['trackingData']);
+  const trackingData = trackingResult.trackingData || [];
+  
   trackingData.push({
     date: today,
     domain: 'manual',
@@ -432,7 +443,7 @@ async function handleMoodClick(mood) {
   await chrome.storage.local.set({ trackingData });
   
   // Show success message
-  showToast('Mood saved! 💚');
+  showToast('Logged your mood');
 }
 
 /**
@@ -491,7 +502,7 @@ async function init() {
   } else if (result.consentGranted === false) {
     // Consent not granted - show message
     mainContent.classList.remove('hidden');
-    appStats.innerHTML = '<div class="text-center py-8 text-gray-400"><p>Tracking is disabled</p><p class="text-sm mt-1">Enable in settings to track your habits</p></div>';
+    appStats.innerHTML = '<div class="text-center py-8 text-gray-400" style="color:black; font-size:20px"><p>Tracking is disabled</p><p class="text-sm mt-1">Enable in settings to track your habits</p></div>';
   } else {
     // Consent granted - show stats
     mainContent.classList.remove('hidden');

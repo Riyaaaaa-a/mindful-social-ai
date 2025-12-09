@@ -123,3 +123,9 @@ Implement `sendToAI()` in `background.js` for Hugging Face integration
 
 
 
+
+
+
+
+
+

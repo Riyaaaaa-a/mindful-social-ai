@@ -381,3 +381,16 @@ This architecture follows Chrome Extension best practices and Manifest v3 specif
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+

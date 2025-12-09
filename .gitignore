@@ -48,6 +48,9 @@ build/
 .env.local
 .env.*.local
 
+# Config files with secrets
+config.js
+
 # Icons (already generated, don't re-commit)
 # Uncomment if you want to track icon generation
 # icons/icon*.png

@@ -48,3 +48,16 @@ All functionality remains the same, but now it's CSP compliant!
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+

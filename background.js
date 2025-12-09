@@ -304,12 +304,12 @@ const rules = [
   }
 ];
 
-chrome.runtime.onInstalled.addListener(() => {
-  chrome.declarativeNetRequest.updateDynamicRules({
-    removeRuleIds: rules.map(r => r.id),
-    addRules: rules
-  });
-});
+// chrome.runtime.onInstalled.addListener(() => {
+//   chrome.declarativeNetRequest.updateDynamicRules({
+//     removeRuleIds: rules.map(r => r.id),
+//     addRules: rules
+//   });
+// });
 
 
 
@@ -398,7 +398,7 @@ async function handleCheckIn(reason) {
     // Generate AI content (both models)
     const [coaching, alternatives] = await Promise.all([
       generateCoachingMessage({ goal: primaryGoal, site: activeDomain, tone: 'warm but firm' }),
-      generateAlternativeActions({ interest: primaryGoal, actionPool: actionPool[0] })
+      generateAlternativeActions({ interest: primaryGoal, actions: actionPool })
     ]);
     
     console.log('✅ AI generation complete');

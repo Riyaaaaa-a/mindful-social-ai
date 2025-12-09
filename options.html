@@ -114,7 +114,35 @@
             </div>
         </div>
 
-        <!-- AI Settings removed: token embedded via config.js per requirements -->
+        <!-- Mood Insights Section -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-4">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4">Mood Insights</h2>
+            
+            <div id="moodInsightsContainer">
+                <div id="moodChartContainer" style="position: relative; height: 300px; margin-bottom: 20px;">
+                    <canvas id="moodChart"></canvas>
+                </div>
+                
+                <div class="flex items-center justify-center gap-4 mb-4">
+                    <div class="flex items-center gap-2">
+                        <div style="width: 20px; height: 20px; background-color: #22c55e; border-radius: 4px;"></div>
+                        <span class="text-sm text-gray-700">Inspired</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div style="width: 20px; height: 20px; background-color: #3b82f6; border-radius: 4px;"></div>
+                        <span class="text-sm text-gray-700">Okay</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div style="width: 20px; height: 20px; background-color: #ef4444; border-radius: 4px;"></div>
+                        <span class="text-sm text-gray-700">Drained</span>
+                    </div>
+                </div>
+                
+                <div id="moodStats" class="grid grid-cols-2 gap-4">
+                    <!-- Stats will be populated dynamically -->
+                </div>
+            </div>
+        </div>
 
         <!-- Statistics Section -->
         <div class="bg-white rounded-lg shadow-md p-6 mb-4">
@@ -152,7 +180,7 @@
                 Track your social media habits and practice mindful digital engagement.
             </p>
             <p class="text-gray-600 text-sm">
-                All data is stored locally on your device. Nothing is transmitted externally.
+                All data is stored locally on your device. Nothing is transmitted externally. Insights are generated using Meta and OpenAI models. Note: AI suggestions are experimental and currently operate with ~74% accuracy.
             </p>
         </div>
 
@@ -164,6 +192,9 @@
         </div>
     </div>
 
+    <!-- Chart.js (local file to avoid CSP issues) -->
+    <script src="chart.js" onload="console.log('Chart.js loaded')" onerror="console.error('Chart.js failed to load')"></script>
+    <script src="moodData.js"></script>
     <script src="options.js"></script>
 </body>
 </html>
