@@ -1,6 +1,6 @@
 {
     "functions": {
-      "SocialMindful_backend/api/**/*.js": {
+      "./api/**/*.js": {
         "runtime": "nodejs18.x",
         "memory": 1024,
         "maxDuration": 10
