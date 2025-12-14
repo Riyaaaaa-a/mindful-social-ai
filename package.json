@@ -1,7 +1,13 @@
 {
-    "name": "mindful-social",
+    "name": "mindful-social-backend",
     "version": "1.0.0",
+    "description": "",
+    "main": "config.js",
     "scripts": {
-      "build": "echo 'Backend ready'"
-    }
+      "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "type": "module"
   }
