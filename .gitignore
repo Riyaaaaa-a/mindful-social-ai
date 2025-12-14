@@ -47,7 +47,7 @@ build/
 .env
 .env.local
 .env.*.local
-
+.vercel/
 # Config files with secrets
 config.js
 
@@ -63,3 +63,4 @@ config.js
 
 
 
+.vercel
