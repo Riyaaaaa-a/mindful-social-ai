@@ -810,29 +810,75 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
 /**
  * Listen for storage changes to update alarm when check-in interval changes or consent is granted
  */
+// chrome.storage.onChanged.addListener(async (changes, areaName) => {
+//   if (areaName === 'local') {
+//     // Handle consent being granted
+//     if (changes.consentGranted && changes.consentGranted.newValue === true) {
+//       console.log('✅ Consent granted - checking for open tracked tabs...');
+//       // Immediately check active tab
+//       setTimeout(() => checkActiveTabForTracking(), 500);
+//     }
+    
+//     // Handle check-in interval change
+//     if (changes.checkinInterval && activeDomain && !isPopupActive) {
+//       const newInterval = parseInt(changes.checkinInterval.newValue);
+//       if (!isNaN(newInterval) && newInterval >= 1) {
+//         console.log(`🔄 Check-in interval changed to ${newInterval} minutes, updating alarm...`);
+        
+//         // Clear old alarm and create new one if tracking is active and popup hasn't shown yet
+//         chrome.alarms.clear('check_in_reminder', () => {
+//           chrome.alarms.create('check_in_reminder', {
+//             delayInMinutes: newInterval
+//             // One-time only
+//           });
+//           console.log(`✅ Alarm updated to ${newInterval} minutes (one-time)`);
+//         });
+//       }
+//     }
+//   }
+// });
+
+/**
+ * Listen for storage changes to update alarm when check-in interval changes
+ */
 chrome.storage.onChanged.addListener(async (changes, areaName) => {
   if (areaName === 'local') {
     // Handle consent being granted
     if (changes.consentGranted && changes.consentGranted.newValue === true) {
       console.log('✅ Consent granted - checking for open tracked tabs...');
-      // Immediately check active tab
       setTimeout(() => checkActiveTabForTracking(), 500);
     }
     
     // Handle check-in interval change
-    if (changes.checkinInterval && activeDomain && !isPopupActive) {
+    if (changes.checkinInterval) {
       const newInterval = parseInt(changes.checkinInterval.newValue);
+      console.log('🔄 Check-in interval changed to:', newInterval, 'minutes');
+      
       if (!isNaN(newInterval) && newInterval >= 1) {
-        console.log(`🔄 Check-in interval changed to ${newInterval} minutes, updating alarm...`);
-        
-        // Clear old alarm and create new one if tracking is active and popup hasn't shown yet
-        chrome.alarms.clear('check_in_reminder', () => {
+        // Only update alarm if we're actively tracking
+        if (activeDomain && activeTabId) {
+          console.log(`🔄 Updating alarm from old interval to ${newInterval} minutes`);
+          
+          // Clear the old alarm completely
+          await new Promise((resolve) => {
+            chrome.alarms.clear('check_in_reminder', (wasCleared) => {
+              console.log('Cleared old alarm:', wasCleared);
+              resolve();
+            });
+          });
+          
+          // Wait a moment
+          await new Promise(resolve => setTimeout(resolve, 500));
+          
+          // Create NEW alarm with new interval
           chrome.alarms.create('check_in_reminder', {
             delayInMinutes: newInterval
-            // One-time only
           });
-          console.log(`✅ Alarm updated to ${newInterval} minutes (one-time)`);
-        });
+          
+          console.log(`✅ New alarm created for ${newInterval} minutes`);
+        } else {
+          console.log('⚠️ No active tracking session, skipping alarm update');
+        }
       }
     }
   }
@@ -1038,3 +1084,10 @@ setInterval(() => {
     logTrackingState();
   }
 }, 60000);
+
+/**
+ * Clear any stale alarms on startup
+ */
+chrome.alarms.clearAll(() => {
+  console.log('🧹 Cleared all stale alarms on startup');
+});

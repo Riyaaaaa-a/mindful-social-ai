@@ -10,9 +10,7 @@
     "activeTab",
     "alarms",
     "notifications",
-    "scripting",
-    "webRequest",
-    "webRequestBlocking"
+    "scripting"
   ],
 
   
@@ -23,7 +21,8 @@
     "https://x.com/*",
     "https://www.tiktok.com/*",
     "https://www.reddit.com/*",
-    "https://router.huggingface.co/*"
+    "https://router.huggingface.co/*",
+    "https://*.replit.app/*"
 
   ],
   
